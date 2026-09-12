@@ -11,26 +11,477 @@
 
     <title>FEB BMS 3D Viewer</title>
 
+    <!-- Google Model Viewer -->
     <script
         type="module"
         src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js">
     </script>
 
+
     <style>
+
+        /* ============================= */
+        /* GENERAL PAGE                  */
+        /* ============================= */
+
+        * {
+            box-sizing: border-box;
+        }
 
         html,
         body {
             margin: 0;
             width: 100%;
             height: 100%;
-            background: #111;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0d0f12;
+            color: white;
         }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* ============================= */
+        /* HEADER                        */
+        /* ============================= */
+
+        header {
+            height: 70px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 30px;
+
+            background: #111418;
+
+            border-bottom: 1px solid #252a30;
+        }
+
+        .title-container h1 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: 1px;
+        }
+
+        .title-container p {
+            margin: 4px 0 0;
+            color: #8c949e;
+            font-size: 13px;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #66ff99;
+        }
+
+
+        /* ============================= */
+        /* MAIN LAYOUT                   */
+        /* ============================= */
+
+        .main-container {
+            flex: 1;
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                320px;
+
+            min-height: 0;
+        }
+
+
+        /* ============================= */
+        /* VIEWER                        */
+        /* ============================= */
+
+        .viewer-container {
+            position: relative;
+            min-width: 0;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    #1c2229,
+                    #0d0f12 70%
+                );
+        }
+
 
         model-viewer {
             width: 100%;
             height: 100%;
-            background-color: #151515;
+
+            min-height: 500px;
+
+            background: transparent;
+
+            --poster-color: transparent;
+        }
+
+
+        /* ============================= */
+        /* CAMERA BUTTONS                */
+        /* ============================= */
+
+        .camera-controls {
+
+            position: absolute;
+
+            bottom: 25px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            display: flex;
+            gap: 8px;
+
+            padding: 8px;
+
+            border-radius: 10px;
+
+            background: rgba(15, 17, 21, 0.85);
+
+            backdrop-filter: blur(10px);
+
+            border: 1px solid #30363d;
+        }
+
+
+        .camera-controls button {
+
+            border: none;
+
+            background: #252a30;
+
+            color: white;
+
+            padding: 10px 16px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            transition:
+                background 0.2s,
+                transform 0.2s;
+        }
+
+
+        .camera-controls button:hover {
+            background: #3a4149;
+            transform: translateY(-1px);
+        }
+
+
+        /* ============================= */
+        /* SIDE PANEL                    */
+        /* ============================= */
+
+        .side-panel {
+
+            padding: 24px;
+
+            background: #111418;
+
+            border-left: 1px solid #252a30;
+
+            overflow-y: auto;
+        }
+
+
+        .panel-section {
+
+            padding-bottom: 24px;
+
+            margin-bottom: 24px;
+
+            border-bottom: 1px solid #252a30;
+        }
+
+
+        .panel-section h2 {
+
+            margin-top: 0;
+
+            font-size: 14px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.2px;
+
+            color: #8c949e;
+        }
+
+
+        .component-name {
+
+            font-size: 24px;
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+        }
+
+
+        .component-type {
+
+            color: #4db8ff;
+
+            margin-bottom: 18px;
+        }
+
+
+        .component-description {
+
+            color: #c5cbd3;
+
+            line-height: 1.6;
+
+            font-size: 14px;
+        }
+
+
+        /* ============================= */
+        /* SYSTEM INFO                   */
+        /* ============================= */
+
+        .info-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            padding: 8px 0;
+
+            font-size: 13px;
+
+            border-bottom: 1px solid #20252b;
+        }
+
+
+        .info-label {
+            color: #89919b;
+        }
+
+
+        .info-value {
+            color: white;
+        }
+
+
+        /* ============================= */
+        /* HOTSPOTS                      */
+        /* ============================= */
+
+        .hotspot {
+
+            width: 22px;
+            height: 22px;
+
+            border-radius: 50%;
+
+            border: 2px solid white;
+
+            background: #168cff;
+
+            cursor: pointer;
+
+            position: relative;
+
+            box-shadow:
+                0 0 0 5px rgba(22, 140, 255, 0.15);
+
+            transition: transform 0.2s;
+        }
+
+
+        .hotspot:hover {
+            transform: scale(1.3);
+        }
+
+
+        .hotspot-label {
+
+            position: absolute;
+
+            left: 30px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            white-space: nowrap;
+
+            background: rgba(10, 12, 15, 0.9);
+
+            padding: 6px 9px;
+
+            border-radius: 5px;
+
+            font-size: 11px;
+
+            pointer-events: none;
+        }
+
+
+        /* ============================= */
+        /* LOADING SCREEN                */
+        /* ============================= */
+
+        #loading-screen {
+
+            position: absolute;
+
+            inset: 0;
+
+            z-index: 10;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            flex-direction: column;
+
+            background: #0d0f12;
+
+            transition:
+                opacity 0.4s ease,
+                visibility 0.4s ease;
+        }
+
+
+        #loading-screen.hidden {
+
+            opacity: 0;
+
+            visibility: hidden;
+        }
+
+
+        .loading-title {
+
+            font-size: 18px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .loading-bar-container {
+
+            width: 260px;
+
+            height: 6px;
+
+            background: #252a30;
+
+            border-radius: 20px;
+
+            overflow: hidden;
+        }
+
+
+        #loading-bar {
+
+            width: 0%;
+
+            height: 100%;
+
+            background: #168cff;
+
+            transition: width 0.15s;
+        }
+
+
+        #loading-percent {
+
+            margin-top: 10px;
+
+            color: #8c949e;
+
+            font-size: 12px;
+        }
+
+
+        /* ============================= */
+        /* HELP TEXT                     */
+        /* ============================= */
+
+        .interaction-help {
+
+            position: absolute;
+
+            top: 20px;
+            left: 20px;
+
+            padding: 9px 12px;
+
+            background: rgba(10, 12, 15, 0.75);
+
+            color: #aab1ba;
+
+            font-size: 11px;
+
+            border-radius: 5px;
+
+            pointer-events: none;
+        }
+
+
+        /* ============================= */
+        /* MOBILE                        */
+        /* ============================= */
+
+        @media (max-width: 850px) {
+
+            .main-container {
+                display: block;
+            }
+
+
+            .viewer-container {
+                height: 65vh;
+            }
+
+
+            .side-panel {
+
+                border-left: none;
+
+                border-top: 1px solid #252a30;
+            }
+
+
+            header {
+
+                padding: 0 15px;
+            }
+
+
+            .camera-controls {
+
+                width: calc(100% - 30px);
+
+                justify-content: center;
+            }
+
+
+            .camera-controls button {
+
+                flex: 1;
+
+                padding: 10px 5px;
+            }
+
         }
 
     </style>
@@ -40,23 +491,600 @@
 
 <body>
 
-    <model-viewer
 
-        src="FEB_BMS.glb"
+<!-- ================================= -->
+<!-- HEADER                            -->
+<!-- ================================= -->
 
-        alt="FEB Battery Management System PCB"
+<header>
 
-        camera-controls
+    <div class="title-container">
 
-        auto-rotate
+        <h1>FEB BATTERY MANAGEMENT SYSTEM</h1>
 
-        shadow-intensity="1"
+        <p>Interactive PCB Engineering Viewer</p>
 
-        exposure="1"
+    </div>
 
-        touch-action="pan-y">
+    <div class="status">
+        ● ONLINE
+    </div>
 
-    </model-viewer>
+</header>
+
+
+
+<!-- ================================= -->
+<!-- MAIN                              -->
+<!-- ================================= -->
+
+<div class="main-container">
+
+
+    <!-- ============================= -->
+    <!-- 3D VIEWER                     -->
+    <!-- ============================= -->
+
+    <div class="viewer-container">
+
+
+        <!-- Loading Screen -->
+
+        <div id="loading-screen">
+
+            <div class="loading-title">
+                Loading FEB BMS
+            </div>
+
+            <div class="loading-bar-container">
+
+                <div id="loading-bar"></div>
+
+            </div>
+
+            <div id="loading-percent">
+                0%
+            </div>
+
+        </div>
+
+
+
+        <div class="interaction-help">
+
+            Drag to rotate • Scroll to zoom
+
+        </div>
+
+
+
+        <!-- ============================= -->
+        <!-- MODEL VIEWER                  -->
+        <!-- ============================= -->
+
+        <model-viewer
+
+            id="pcb-viewer"
+
+            src="FEB_BMS.glb"
+
+            alt="FEB Battery Management System PCB"
+
+            camera-controls
+
+            auto-rotate
+
+            rotation-per-second="8deg"
+
+            shadow-intensity="1"
+
+            shadow-softness="0.7"
+
+            exposure="1.1"
+
+            environment-image="neutral"
+
+            camera-orbit="45deg 65deg auto"
+
+            interaction-prompt="none"
+
+            touch-action="pan-y">
+
+
+            <!-- ========================= -->
+            <!-- HOTSPOT 1                 -->
+            <!-- ========================= -->
+
+            <button
+
+                class="hotspot"
+
+                slot="hotspot-1"
+
+                data-position="0m 0.01m 0m"
+
+                data-normal="0m 1m 0m"
+
+                data-name="U1"
+
+                data-type="Battery Monitor"
+
+                data-description="
+                Measures individual accumulator cell voltages
+                and communicates voltage data to the rest
+                of the BMS.
+                ">
+
+                <span class="hotspot-label">
+                    U1
+                </span>
+
+            </button>
+
+
+
+            <!-- ========================= -->
+            <!-- HOTSPOT 2                 -->
+            <!-- ========================= -->
+
+            <button
+
+                class="hotspot"
+
+                slot="hotspot-2"
+
+                data-position="0.03m 0.01m 0m"
+
+                data-normal="0m 1m 0m"
+
+                data-name="Q1"
+
+                data-type="MOSFET"
+
+                data-description="
+                Power transistor used as part of the
+                cell-balancing circuitry.
+                ">
+
+                <span class="hotspot-label">
+                    Q1
+                </span>
+
+            </button>
+
+
+
+            <!-- ========================= -->
+            <!-- HOTSPOT 3                 -->
+            <!-- ========================= -->
+
+            <button
+
+                class="hotspot"
+
+                slot="hotspot-3"
+
+                data-position="-0.03m 0.01m 0m"
+
+                data-normal="0m 1m 0m"
+
+                data-name="J1"
+
+                data-type="Connector"
+
+                data-description="
+                Electrical interface connecting the board
+                to the accumulator system.
+                ">
+
+                <span class="hotspot-label">
+                    J1
+                </span>
+
+            </button>
+
+
+        </model-viewer>
+
+
+
+        <!-- ============================= -->
+        <!-- CAMERA CONTROLS               -->
+        <!-- ============================= -->
+
+        <div class="camera-controls">
+
+            <button id="top-button">
+                TOP
+            </button>
+
+            <button id="bottom-button">
+                BOTTOM
+            </button>
+
+            <button id="iso-button">
+                ISO
+            </button>
+
+            <button id="reset-button">
+                RESET
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ============================= -->
+    <!-- INFORMATION PANEL             -->
+    <!-- ============================= -->
+
+    <aside class="side-panel">
+
+
+        <div class="panel-section">
+
+            <h2>
+                Selected Component
+            </h2>
+
+
+            <div
+                id="component-name"
+                class="component-name">
+
+                PCB
+
+            </div>
+
+
+            <div
+                id="component-type"
+                class="component-type">
+
+                FEB BMS
+
+            </div>
+
+
+            <div
+                id="component-description"
+                class="component-description">
+
+                Click one of the blue markers on the board
+                to learn more about that component.
+
+            </div>
+
+        </div>
+
+
+
+        <div class="panel-section">
+
+            <h2>
+                System
+            </h2>
+
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Project
+                </span>
+
+                <span class="info-value">
+                    FEB BMS
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Design
+                </span>
+
+                <span class="info-value">
+                    KiCad
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Viewer
+                </span>
+
+                <span class="info-value">
+                    WebGL
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Model
+                </span>
+
+                <span class="info-value">
+                    GLB
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="panel-section">
+
+            <h2>
+                Navigation
+            </h2>
+
+            <div class="component-description">
+
+                <strong>Rotate</strong><br>
+                Click and drag
+                <br><br>
+
+                <strong>Zoom</strong><br>
+                Scroll or pinch
+                <br><br>
+
+                <strong>Inspect</strong><br>
+                Click a blue component marker
+
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+</div>
+
+
+
+<!-- ================================= -->
+<!-- JAVASCRIPT                        -->
+<!-- ================================= -->
+
+<script>
+
+    const viewer =
+        document.getElementById("pcb-viewer");
+
+
+    /* ============================= */
+    /* CAMERA BUTTONS                */
+    /* ============================= */
+
+
+    const topButton =
+        document.getElementById("top-button");
+
+    const bottomButton =
+        document.getElementById("bottom-button");
+
+    const isoButton =
+        document.getElementById("iso-button");
+
+    const resetButton =
+        document.getElementById("reset-button");
+
+
+
+    topButton.addEventListener(
+        "click",
+        () => {
+
+            viewer.cameraOrbit =
+                "0deg 0deg auto";
+
+            stopAutoRotate();
+
+        }
+    );
+
+
+
+    bottomButton.addEventListener(
+        "click",
+        () => {
+
+            viewer.cameraOrbit =
+                "0deg 180deg auto";
+
+            stopAutoRotate();
+
+        }
+    );
+
+
+
+    isoButton.addEventListener(
+        "click",
+        () => {
+
+            viewer.cameraOrbit =
+                "45deg 65deg auto";
+
+            stopAutoRotate();
+
+        }
+    );
+
+
+
+    resetButton.addEventListener(
+        "click",
+        () => {
+
+            viewer.cameraOrbit =
+                "45deg 65deg auto";
+
+            viewer.cameraTarget =
+                "auto auto auto";
+
+            viewer.fieldOfView =
+                "auto";
+
+            stopAutoRotate();
+
+        }
+    );
+
+
+
+    /* ============================= */
+    /* STOP AUTO ROTATE              */
+    /* ============================= */
+
+
+    function stopAutoRotate() {
+
+        viewer.removeAttribute(
+            "auto-rotate"
+        );
+
+    }
+
+
+    viewer.addEventListener(
+        "pointerdown",
+        stopAutoRotate
+    );
+
+
+
+    /* ============================= */
+    /* LOADING PROGRESS              */
+    /* ============================= */
+
+
+    const loadingScreen =
+        document.getElementById(
+            "loading-screen"
+        );
+
+    const loadingBar =
+        document.getElementById(
+            "loading-bar"
+        );
+
+    const loadingPercent =
+        document.getElementById(
+            "loading-percent"
+        );
+
+
+
+    viewer.addEventListener(
+        "progress",
+        (event) => {
+
+            const progress =
+                event.detail.totalProgress;
+
+            const percent =
+                Math.round(progress * 100);
+
+
+            loadingBar.style.width =
+                percent + "%";
+
+            loadingPercent.textContent =
+                percent + "%";
+
+
+            if (progress === 1) {
+
+                setTimeout(
+                    () => {
+
+                        loadingScreen.classList.add(
+                            "hidden"
+                        );
+
+                    },
+                    300
+                );
+
+            }
+
+        }
+    );
+
+
+
+    /* ============================= */
+    /* COMPONENT HOTSPOTS            */
+    /* ============================= */
+
+
+    const componentName =
+        document.getElementById(
+            "component-name"
+        );
+
+    const componentType =
+        document.getElementById(
+            "component-type"
+        );
+
+    const componentDescription =
+        document.getElementById(
+            "component-description"
+        );
+
+
+
+    const hotspots =
+        document.querySelectorAll(
+            ".hotspot"
+        );
+
+
+
+    hotspots.forEach(
+        (hotspot) => {
+
+            hotspot.addEventListener(
+                "click",
+                () => {
+
+                    componentName.textContent =
+                        hotspot.dataset.name;
+
+                    componentType.textContent =
+                        hotspot.dataset.type;
+
+                    componentDescription.textContent =
+                        hotspot.dataset.description
+                            .replace(/\s+/g, " ")
+                            .trim();
+
+                    stopAutoRotate();
+
+                }
+            );
+
+        }
+    );
+
+
+</script>
+
 
 </body>
 
